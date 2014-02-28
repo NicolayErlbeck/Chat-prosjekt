@@ -44,7 +44,7 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
 
 if __name__ == "__main__":
-    HOST = 'localhost'
+    HOST = '78.91.7.116'
     PORT = 9999
 
     # Create the server, binding to localhost on port 9999
