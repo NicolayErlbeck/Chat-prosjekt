@@ -4,7 +4,7 @@ Very simple server implementation that should serve as a basis
 for implementing the chat server
 '''
 import SocketServer
-from MessageWorker import ReceiveMessageWorker
+#from MessageWorker import ReceiveMessageWorker
 '''
 The RequestHandler class for our server.
 
