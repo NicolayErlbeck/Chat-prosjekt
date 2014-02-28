@@ -2,7 +2,7 @@
 KTN-project 2013 / 2014
 '''
 import socket
-
+from MessageWorker import ReceiveMessageWorker
 
 class Client(object):
 
