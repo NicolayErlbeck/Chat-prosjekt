@@ -13,13 +13,32 @@ entire calling process' stack until the run() is finished.
 it is the start() method that is responsible for actually
 executing the run() method in a new thread.
 '''
-from threading import Thread
 
+'''
+Look here for more threading info:
+http://www.radekdostal.com/content/android-bluetooth-chat-multi-thread-echo-server-python
+'''
+
+from threading import Thread
+import time
 
 class ReceiveMessageWorker(Thread):
 
     def __init__(self, listener, connection):
-        self.daemeon = True
+    	Thread.__init__(self)
+    	self.daemeon = True
+    	self.connection = connection
+    	self.listener = listener
+        
 
     def run(self):
-        pass
+    	print "HERE!\n"
+    	try:
+            while True:
+                data = self.connection.recv(1024).strip()
+                if len(data) == 0: break
+                print 'Received from server: ' + data + '\n'
+
+        except IOError:
+        	self.connection.close()
+        	print "Disconnected"

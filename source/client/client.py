@@ -3,6 +3,8 @@ KTN-project 2013 / 2014
 '''
 import socket
 from MessageWorker import ReceiveMessageWorker
+from threading import Thread
+import time
 
 class Client(object):
 
@@ -11,10 +13,11 @@ class Client(object):
 
     def start(self, host, port):
         self.connection.connect((host, port))
-        self.send('Hello')
-        received_data = self.connection.recv(1024).strip()
-        print 'Received from server: ' + received_data
-        self.connection.close()
+        
+		#self.send('Hello')
+        #received_data = self.connection.recv(1024).strip()
+        #print 'Received from server: ' + received_data
+        #self.connection.close()
 
     def message_received(self, message, connection):
         pass
@@ -26,9 +29,26 @@ class Client(object):
         self.connection.sendall(data)
 
     def force_disconnect(self):
-        pass
+		self.connection.close()
+        #pass
 
-
+		
 if __name__ == "__main__":
     client = Client()
     client.start('localhost', 9999)
+    msgWorkerThread = ReceiveMessageWorker(client,client.connection) #call as ReceiveMessageWorker(listener,connection)
+    msgWorkerThread.start()
+    
+    #testing
+    time.sleep(1)
+    client.send('Heartbeat: 1')
+    time.sleep(1)
+    client.send('Heartbeat: 2')
+    while 1:
+        #get user input etc.
+        pass
+        
+    msgWorkerThread.join()
+    client.force_disconnect()
+    print "Client disconnected"
+    
