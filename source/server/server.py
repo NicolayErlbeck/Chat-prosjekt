@@ -52,4 +52,14 @@ if __name__ == "__main__":
     # Activate the server; this will keep running until you
     # interrupt the program with Ctrl-C
     server.serve_forever()
-
+	
+def validUsername(username, onlineClients):
+    if re.match(r'\w+$', text):
+        # valid username! see: http://docs.python.org/2/library/re.html#search-vs-match [ctrl] + f: When the LOCALE and UNICODE flags are not specified, matches any alphanumeric character and the underscore;
+        if not username in onlineClients:
+            #username not taken, return true!
+            return 1
+        else:
+            #username taken 
+            return -1
+    return 0 #username contains invalid characters
