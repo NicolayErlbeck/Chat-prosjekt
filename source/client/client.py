@@ -20,7 +20,9 @@ class Client(object):
         #self.connection.close()
 
     def message_received(self, message, connection):
-        pass
+		if len(message) != 0:
+			print message
+        #pass
 
     def connection_closed(self, connection):
         pass
@@ -46,8 +48,6 @@ if __name__ == "__main__":
     client.send('Heartbeat: 2')
     while 1:
         #get user input etc.
-        pass
-        
     msgWorkerThread.join()
     client.force_disconnect()
     print "Client disconnected"
