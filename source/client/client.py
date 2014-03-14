@@ -22,11 +22,20 @@ class Client(object):
 
     def message_received(self, message, connection):
         if len(message) != 0:
-            print "Message: " + "\n" + message
-        #pass
-
+            print "\nMessage: " + "\n" + message
+            try:
+                msg = json.loads(message)
+                if 'error' in msg:
+                    print "\n"+msg['error']
+                    self.loginRequest()
+                else:
+                    print "\nMessage: " + msg['message']
+            except:
+                print "\nInvalid message received"
+                return
+            
     def connection_closed(self, connection):
-        print "Connection with server is closed"
+        print "\nConnection with server is closed"
         #todo: try to reconnect??
         self.loginRequest()
         pass
@@ -40,25 +49,25 @@ class Client(object):
     
     def loginRequest(self):
         while 1:
-            username = raw_input("Type username: ")
+            username = raw_input("\nType username: ")
             try:
                 login = {'request': 'login', 'username': username}
                 loginJson = json.dumps(login)
             except:
-                print "Invalid username"
+                print "\nInvalid username"
                 return
             try:
                 self.send(loginJson)
                 responseJson = self.connection.recv(1024).strip()
             except:
-                print "No contact with server"
+                print "\nNo contact with server"
                 self.connection_closed(self.connection)
                 return
             try:
                 response = json.loads(responseJson)
                 print response
             except:
-                print "Invalid username"
+                print "\nInvalid username"
                 return
             break
             
@@ -100,14 +109,7 @@ if __name__ == "__main__":
 
     msgWorkerThread = ReceiveMessageWorker(client,client.connection) #call as ReceiveMessageWorker(listener,connection)
     msgWorkerThread.start()
-    
-    
-    
-    #testing
-    #time.sleep(1)
-    #client.send('Heartbeat: 1')
-    #time.sleep(1)
-    #client.send('Heartbeat: 2')
+
     while 1:
         #get user input etc.
         msg = raw_input("Type a message: ")
