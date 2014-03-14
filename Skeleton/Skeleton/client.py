@@ -31,4 +31,5 @@ class Client(object):
 
 if __name__ == "__main__":
     client = Client()
-    client.start('78.91.3.69', 9999)
+    client.start('78.91.7.178', 1212)
+#'78.91.7.178'
