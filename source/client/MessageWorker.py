@@ -32,7 +32,7 @@ class ReceiveMessageWorker(Thread):
         
 
     def run(self):
-    	print "HERE!\n"
+    	#print "HERE!\n"
     	try:
             while True:
                 data = self.connection.recv(1024).strip()
@@ -40,5 +40,6 @@ class ReceiveMessageWorker(Thread):
 				#if len(data) == 0: break
                 
         except IOError:
+                print IOError
         	self.listener.force_disconnect()
-        	print "Disconnected"
+        	print "Disconnected from messageworker"
