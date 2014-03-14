@@ -31,4 +31,9 @@ class Client(object):
 
 if __name__ == "__main__":
     client = Client()
+<<<<<<< HEAD
     client.start('78.91.38.244', 9999)
+=======
+    client.start('78.91.7.178', 1212)
+#'78.91.7.178'
+>>>>>>> f14af58c2b59c5291b7c27c6c75357c8fad05c2a
