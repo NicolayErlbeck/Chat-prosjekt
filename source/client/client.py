@@ -4,25 +4,24 @@ KTN-project 2013 / 2014
 import socket
 from MessageWorker import ReceiveMessageWorker
 from threading import Thread
-import time
 import json
 
 class Client(object):
 
     def __init__(self):
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection.settimeout(2)
 
     def start(self, host, port):
-        self.connection.connect((host, port))
-        
-        #self.send('Hello')
-        #received_data = self.connection.recv(1024).strip()
-        #print 'Received from server: ' + received_data
-        #self.connection.close()
+        try:
+            self.connection.connect((host, port))
+        except:
+            print "No contact with server, retry"
+            #self.start(host, port)
 
     def message_received(self, message, connection):
         if len(message) != 0:
-            print "\nMessage: " + "\n" + message
+            print "\nMessage: " + "\n" + message            #to be removed
             try:
                 msg = json.loads(message)
                 if 'error' in msg:
@@ -45,7 +44,7 @@ class Client(object):
 
     def force_disconnect(self):
         self.connection.close()
-        #pass
+        self.connection_closed(self.connection)
     
     def loginRequest(self):
         while 1:
@@ -82,6 +81,7 @@ class Client(object):
             print "Invalid message received"
             
     def logoutRequest(self):
+        print "Logging out.."
         logout = {'request': 'logout'}
         logoutJson = json.dumps(logout)
         self.send(logoutJson)
@@ -103,16 +103,19 @@ class Client(object):
             
 if __name__ == "__main__":
     client = Client()
-    client.start('localhost', 9999)
-
+    #client.start('localhost', 9999)
+    #client.start('78.91.29.196', 9999)
+    #client.start('78.91.7.178', 9999)
+    client.start('78.91.7.32', 9999)
     client.loginRequest()
 
     msgWorkerThread = ReceiveMessageWorker(client,client.connection) #call as ReceiveMessageWorker(listener,connection)
     msgWorkerThread.start()
 
     while 1:
-        #get user input etc.
         msg = raw_input("Type a message: ")
+        if msg == 'logout':
+            client.logoutRequest()
         client.sendMessage(msg)
     msgWorkerThread.join()
     client.force_disconnect()
