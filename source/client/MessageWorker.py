@@ -40,5 +40,6 @@ class ReceiveMessageWorker(Thread):
 				#if len(data) == 0: break
                 
         except IOError:
-        	self.listener.force_disconnect()
-        	print "Disconnected from messageworker"
+                print "\nDisconnected from messageworker"
+        	self.listener.connection_closed()
+        	
