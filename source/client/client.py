@@ -28,7 +28,7 @@ class Client(object):
 
     def message_received(self, message, connection):
         if len(message) != 0:
-            print "\nMessage: " + "\n" + message            #to be removed
+            #print "\nMessage: " + "\n" + message            #to be removed
             try:
                 msg = json.loads(message)
                 if 'error' in msg:

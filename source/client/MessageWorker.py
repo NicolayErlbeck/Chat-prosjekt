@@ -36,10 +36,13 @@ class ReceiveMessageWorker(Thread):
     	try:
             while True:
                 data = self.connection.recv(1024).strip()
+                if len(data) != 0:
+                    print "\nReceiveMessageWorker: " + data
                 self.listener.message_received(data, self.connection)
 				#if len(data) == 0: break
                 
         except IOError:
-                print "\nDisconnected from messageworker"
-        	self.listener.connection_closed()
+                print "IOError"
+                #print "\nDisconnected from messageworker"
+        	#self.listener.connection_closed()
         	
