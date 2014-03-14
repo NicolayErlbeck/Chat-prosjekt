@@ -106,7 +106,7 @@ if __name__ == "__main__":
     #client.start('localhost', 9999)
     #client.start('78.91.29.196', 9999)
     #client.start('78.91.7.178', 9999)
-    client.start('78.91.7.32', 9999)
+    client.start('78.91.38.244', 9999)
     client.loginRequest()
 
     msgWorkerThread = ReceiveMessageWorker(client,client.connection) #call as ReceiveMessageWorker(listener,connection)

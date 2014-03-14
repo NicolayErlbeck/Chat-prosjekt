@@ -4,6 +4,7 @@ Very simple server implementation that should serve as a basis
 for implementing the chat server
 '''
 import SocketServer
+import json
 import re
 #from MessageWorker import ReceiveMessageWorker
 '''
@@ -17,37 +18,37 @@ client.
 onlineClients = {}
 
 class ClientHandler(SocketServer.BaseRequestHandler):
-	def handle(self):
-		# Get a reference to the socket object
-		self.connection = self.request
-		# Get the remote ip adress of the socket
-		self.ip = self.client_address[0]
-		# Get the remote port number of the socket
-		self.port = self.client_address[1]
-		print 'Client connected @' + self.ip + ':' + str(self.port)
-		# Wait for data from the client
-		while True:
-                    data = self.connection.recv(1024).strip()
-                    # Check if the data exists
-                    # (recv could have returned due to a disconnect)
-                    if data:
-                        print data
-                        self.requestHandler(data)
-                                
+    def handle(self):
+        # Get a reference to the socket object
+        self.connection = self.request
+        # Get the remote ip adress of the socket
+        self.ip = self.client_address[0]
+        # Get the remote port number of the socket
+        self.port = self.client_address[1]
+        print 'Client connected @' + self.ip + ':' + str(self.port)
+        # Wait for data from the client
+        while True:
+            data = self.connection.recv(1024).strip()
+            # Check if the data exists
+            # (recv could have returned due to a disconnect)
+            if data:
+                print data
+                self.requestHandler(self,data)
+                            
                                 # Return the string in uppercase
                                 # self.connection.sendall(data.upper())
-                    else:
-                                print 'Client disconnected!'
-                    break
-	def requestHandler(self,data):
-            try:
-                    dict = json.loads(data)
-                    if 'request' in dict:
-                            request = dict['request']
-                    if request in requestTypes:
-                         requestTypes[request](dict)
-            except:
-                    print 'Invalid request'
+            else:
+                print 'Client disconnected!'
+                break
+    def requestHandler(self,data):
+        try:
+            dict = json.loads(data)
+            if 'request' in dict:
+                request = dict['request']
+                if request in requestTypes:
+                    requestTypes[request](self,dict)
+        except:
+            print 'Invalid request'
                             
         def handleLoginRequest(self,dict):
                 if 'username' in dict:
@@ -87,8 +88,8 @@ class ClientHandler(SocketServer.BaseRequestHandler):
                     msg = json.dumps({'response': 'logout','error': 'Not logged in!', 'username': user})
             self.connection.sendall(msg)
 
-	
-		
+    
+        
 
         def validUsername(self,username):
             if re.match(r'\w+$', username):
@@ -109,24 +110,24 @@ Very important, otherwise only one client will be served at a time
 
 
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
-	pass
+    pass
 
 if __name__ == "__main__":
-	#HOST = '78.91.7.255'
-        #HOST = 'localhost'
-        HOST  = ''
-	PORT = 2224
-        print("Hei")
-	# Create the server, binding to localhost on port 9999
-	server = ThreadedTCPServer((HOST, PORT), ClientHandler)
-	# Activate the server; this will keep running until you
-	# interrupt the program with Ctrl-C
-	server.serve_forever()
+    #HOST = '78.91.7.255'
+    #HOST = 'localhost'
+    HOST  = '78.91.38.244'
+    PORT = 2224
+    print("Hei")
+    # Create the server, binding to localhost on port 9999
+    server = ThreadedTCPServer((HOST, PORT), ClientHandler)
+    # Activate the server; this will keep running until you
+    # interrupt the program with Ctrl-C
+    server.serve_forever()
 
 requestTypes = {     #Holds the different requests a client can send
            'login'     : handleLoginRequest,
-	   'message'     : handleMessageRequest,
-	   'logout'    : handleLogoutRequest,
+       'message'     : handleMessageRequest,
+       'logout'    : handleLogoutRequest,
  }
 
 
