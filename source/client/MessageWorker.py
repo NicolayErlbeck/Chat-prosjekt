@@ -26,22 +26,22 @@ class ReceiveMessageWorker(Thread):
 
     def __init__(self, listener, connection):
     	Thread.__init__(self)
-    	self.daemeon = True
+    	self.daemon = True
     	self.connection = connection
     	self.listener = listener
         
 
     def run(self):
     	#print "HERE!\n"
-    	try:
-            while True:
+    	
+        while True:
+            try:
                 data = self.connection.recv(1024).strip()
                 if len(data) != 0:
                     print "\nReceiveMessageWorker: " + data
                 self.listener.message_received(data, self.connection)
-				#if len(data) == 0: break
-                
-        except IOError:
+                                #if len(data) == 0: break                
+            except IOError:
                 print "IOError"
                 #print "\nDisconnected from messageworker"
         	#self.listener.connection_closed()

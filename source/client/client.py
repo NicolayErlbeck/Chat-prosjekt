@@ -9,7 +9,7 @@ import time
 import sys
 
 loginTimeOut = 60
-SERVER = '78.91.29.196'
+SERVER = 'localhost'
 PORT = 9999
 
 class Client(object):
