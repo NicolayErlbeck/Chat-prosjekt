@@ -17,6 +17,9 @@ client.
 '''
 
 class ClientHandler(SocketServer.BaseRequestHandler):
+    onlineClients = {}
+    messageLog = ""
+
     def handle(self):
             # Get a reference to the socket object
         self.connection = self.request
@@ -45,12 +48,12 @@ class ClientHandler(SocketServer.BaseRequestHandler):
             except socket.timeout:
                 print 'Socket timeout'
                 continue
-            #except:
-            #    print('Lost connection to client!')
-            #    connKey = self.checkIfLoggedIn()
-            #    if connKey != '$NotInOnlineList$':
-            #        del onlineClients[connKey]
-            #    break
+            except:
+                print('Lost connection to client!')
+                connKey = self.checkIfLoggedIn()
+                if connKey != '$NotInOnlineList$':
+                    del self.onlineClients[connKey]
+                break
 
     def requestHandler(self, data):
         #try:
@@ -89,10 +92,12 @@ self.requestTypes[request](dict1)
             valUser = self.validUsername(username)
             print("Valuser = ", valUser)
             if valUser == 1:
-                data = json.dumps({'response': 'login', 'username': username, 'messages': messages})
+                print "Content of log: "+self.messageLog
+                data = json.dumps({'response': 'login', 'username': username, 'messages': self.messageLog})
                 print("add client!")
-                onlineClients[username] = self.connection
-                print(onlineClients.keys())
+                print "Data to send: " + data
+                self.onlineClients[username] = self.connection
+                print(self.onlineClients.keys())
             elif valUser == 0:
                 data = json.dumps({'response': 'login', 'error': 'Invalid username!', 'username': username})
             else:
@@ -105,14 +110,19 @@ self.requestTypes[request](dict1)
         if self.checkIfLoggedIn() != '$NotInOnlineList$':
             #print("Logged in!")
             if 'message' in dict1:
-                print("Message is:"+ dict1['message'])
-                msg = json.dumps({'response': 'message','message':dict1['message']})
+                message = dict1['message']
+                print("Message is:"+ message)
+                msg = json.dumps({'response': 'message','message':message})
                 print(msg)
                 ######TROUBLE
-                #messages += dict1['message']
+                print "Logg for data"
+                print(self.messageLog)
+                self.messageLog += message
+                print "Logg etter data"
+                print(self.messageLog)
                 ######
                 print "HERE!"
-                for conn in onlineClients.values():
+                for conn in self.onlineClients.values():
                     print "Here again"
                     print(conn)
                     conn.sendall(msg.encode())
@@ -123,7 +133,7 @@ self.requestTypes[request](dict1)
                 self.connection.sendall(msg.encode())
         
     def checkIfLoggedIn(self):
-        for k, v in onlineClients.items():
+        for k, v in self.onlineClients.items():
             if v:
                 if self.connection == v:
                     return k
@@ -134,9 +144,9 @@ self.requestTypes[request](dict1)
         user = self.checkIfLoggedIn()
         if user != '$NotInOnlineList$':
             msg = json.dumps({'response': 'logout', 'username': user})
-            del onlineClients[user]
+            del self.onlineClients[user]
             print('User ' + user + ' deleted!')
-            print(onlineClients.keys())
+            print(self.onlineClients.keys())
         else:
             msg = json.dumps({'response': 'logout','error': 'Not logged in!', 'username': user})
         self.connection.sendall(msg.encode())
@@ -145,7 +155,7 @@ self.requestTypes[request](dict1)
     def validUsername(self, username):
         if re.match(r'\w+$', username):
             # valid username! see: http://docs.python.org/2/library/re.html#search-vs-match [ctrl] + f: When the LOCALE and UNICODE flags are not specified, matches any alphanumeric character and the underscore;
-                if username not in onlineClients:
+                if username not in self.onlineClients:
                     #username not taken, return true!
                     return 1
                 else:
@@ -170,9 +180,9 @@ class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
 
 
-onlineClients = {}
-messages = ""
+
 if __name__ == "__main__":
+    
     HOST = ''#78.91.29.196'
     PORT = 9999
 

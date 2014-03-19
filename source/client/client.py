@@ -99,7 +99,8 @@ class Client(object):
             break
         try:
             if 'error' in response:
-                print response['username']
+                if 'username' in response:
+                    print response['username']
                 print response['error']
             else:
                 print response['username'] + ' logged in, printing all messages: '
