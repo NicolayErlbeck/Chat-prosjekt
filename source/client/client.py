@@ -8,7 +8,7 @@ import json
 import time
 import sys
 
-loginTimeOut = 60
+loginTimeOut = 5
 SERVER = 'localhost'
 PORT = 9999
 
@@ -31,29 +31,41 @@ class Client(object):
             #print "\nMessage: " + "\n" + message            #to be removed
             try:
                 msg = json.loads(message)
-                if 'error' in msg:
-                    print "\n"+msg['error']
-                    self.loginRequest()
-                else:
-                    print "\nMessage: " + msg['message']
+                if 'logout' in msg:
+                    if 'error' in msg:
+                        print "\n" + msg['username'] +" : " + msg['error']
+                    else:
+                        print "\n" + msg['username'] + " logging out"
+                elif 'login' in msg:
+                    if not 'error' in msg:
+                        print "\n" + msg['username'] + " logged in"
+                elif 'message' in msg:
+                    if 'error' in msg:
+                        print "\n"+msg['error']
+                        self.loginRequest()
+                        return
+                    else:
+                        print "\nMessage: " + msg['message'] #+ "\n:"                        
             except:
                 print "\nInvalid message received"
                 return
+            return
             
     def connection_closed(self):
         print "\nConnection with server is closed"
+        terminate()
         #how to restart thread?
-        msg = raw_input("Try to reconnect (if not program will close)? (yes/no): ")
-        if msg == 'yes':
-            print "Trying to reconnect, please be patient..."
-            self.force_disconnect()
-            time.sleep(5)
-            self.start(SERVER, PORT)
-            self.loginRequest()
-            msgWorkerThread.start()
-        else:
-            terminate()
-        pass
+#        msg = raw_input("Try to reconnect (if not program will close)? (yes/no): ")
+#        if msg == 'yes':
+#            print "Trying to reconnect, please be patient..."
+#            self.force_disconnect()
+#            time.sleep(5)
+#            self.start(SERVER, PORT)
+#            self.loginRequest()
+#            msgWorkerThread.start()
+#        else:
+         
+#        pass
     
     def send(self, data):
         self.connection.sendall(data)
@@ -75,7 +87,7 @@ class Client(object):
                 #print loginJson
             except:
                 print "\nInvalid username"
-                return
+                continue
             try:
                 self.send(loginJson)
                 responseJson = self.connection.recv(1024).strip()
@@ -90,30 +102,33 @@ class Client(object):
             except:
                 print "\nNo contact with server"
                 self.connection_closed()
-                return
             try:
                 response = json.loads(responseJson)
                 
             except:
                 print "\nInvalid response from server"
-            break
-        try:
-            if 'error' in response:
-                if 'username' in response:
-                    print response['username']
-                print response['error']
-            else:
-                print response['username'] + ' logged in, printing all messages: '
-                print response['messages']
-        except:
-            print "Invalid message received"
-            
+                self.connection_closed()
+            try:
+                if 'error' in response:
+                    if 'username' in response:
+                        print response['username']
+                    print response['error']
+                    continue
+                else:
+                    print response['username'] + ' logged in, printing all messages: '
+                    print response['messages']
+                    break
+            except:
+                print "Invalid message received"
+                self.connection_closed()
+                
     def logoutRequest(self):
         print "Logging out.."
         logout = {'request': 'logout'}
         logoutJson = json.dumps(logout)
         self.send(logoutJson)
         self.force_disconnect()
+        self.connection_closed()
             
     def sendMessage(self, data):
         try:
@@ -124,7 +139,7 @@ class Client(object):
             return
         try:
             self.send(msgJson)
-            print "Msg sent"
+            #print "Msg sent"
         except:
             print "No contact when sending msg to server"
             self.connection_closed()
@@ -136,10 +151,7 @@ def terminate():
 if __name__ == "__main__":
     print "Welcome to The KTN-chat!"
     client = Client()
-    #client.start('localhost', 9999)
     client.start(SERVER, PORT)
-    #client.start('78.91.7.178', 9999)
-    #client.start('78.91.7.32', 9999)
     client.loginRequest()
 
     print "Type in a message followed by enter to send,"
@@ -148,7 +160,8 @@ if __name__ == "__main__":
     msgWorkerThread = ReceiveMessageWorker(client,client.connection) #call as ReceiveMessageWorker(listener,connection)
     msgWorkerThread.start()
     while 1:
-        msg = raw_input("Type a message: ")
+        #print ": "
+        msg = raw_input()#": ")
         if msg == 'logout':
             client.logoutRequest()
         client.sendMessage(msg)

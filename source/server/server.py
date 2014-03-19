@@ -97,11 +97,14 @@ self.requestTypes[request](dict1)
                 print("add client!")
                 onlineClients[username] = self.connection
                 print(onlineClients.keys())
+                for conn in onlineClients.values():
+                    conn.sendall(data.encode())
             elif valUser == 0:
                 data = json.dumps({'response': 'login', 'error': 'Invalid username!', 'username': username})
+                self.connection.sendall(data.encode())
             else:
                 data = json.dumps({'response': 'login', 'error': 'Name already taken!', 'username': username})
-            self.connection.sendall(data.encode())
+                self.connection.sendall(data.encode())
             print("send!")
         return
 
@@ -146,9 +149,11 @@ self.requestTypes[request](dict1)
             del onlineClients[user]
             print('User ' + user + ' deleted!')
             print(onlineClients.keys())
+            for conn in onlineClients.values():
+                conn.sendall(msg.encode())
         else:
             msg = json.dumps({'response': 'logout','error': 'Not logged in!', 'username': user})
-        self.connection.sendall(msg.encode())
+            self.connection.sendall(msg.encode())
 
 
     def validUsername(self, username):
