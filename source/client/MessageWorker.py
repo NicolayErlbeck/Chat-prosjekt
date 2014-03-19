@@ -38,9 +38,7 @@ class ReceiveMessageWorker(Thread):
             try:
                 data = self.connection.recv(1024).strip()
                 if len(data) != 0:
-                    #print "\nReceiveMessageWorker: " + data
                     self.listener.message_received(data, self.connection)
-                                #if len(data) == 0: break
             except socket.timeout:
                 continue
             except:

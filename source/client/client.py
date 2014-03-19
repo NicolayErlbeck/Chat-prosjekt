@@ -82,10 +82,6 @@ class Client(object):
                 login = {'request': 'login', 'username': username}
                 loginJson = json.dumps(login)
                 test = json.loads(loginJson)
-                
-                #print test['username']
-                #print test['request']
-                #print loginJson
             except:
                 print "\nInvalid username"
                 continue
@@ -133,14 +129,14 @@ class Client(object):
             
     def sendMessage(self, data):
         try:
-            msg = {'request': 'message', 'message': data}
+            decoded = data.decode("utf-8")
+            msg = {'request': 'message', 'message': decoded}
             msgJson = json.dumps(msg)
         except:
             print "Invalid text"
             return
         try:
             self.send(msgJson)
-            #print "Msg sent"
         except:
             print "No contact when sending msg to server"
             self.connection_closed()
@@ -158,13 +154,12 @@ if __name__ == "__main__":
     print "Type in a message followed by enter to send,"
     print "please type \'logout\' to log out"
     
-    msgWorkerThread = ReceiveMessageWorker(client,client.connection) #call as ReceiveMessageWorker(listener,connection)
+    msgWorkerThread = ReceiveMessageWorker(client,client.connection)
     msgWorkerThread.start()
     while 1:
-        #print ": "
-        msg = raw_input()#": ")
+        msg = raw_input()
         if msg == 'logout':
-            client.logoutRequest()
+            client.logoutRequest()    
         client.sendMessage(msg)
     msgWorkerThread.join()
     client.force_disconnect()
