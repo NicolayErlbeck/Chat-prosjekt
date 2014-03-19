@@ -42,7 +42,7 @@ class Client(object):
             
     def connection_closed(self):
         print "\nConnection with server is closed"
-        
+        #how to restart thread?
         msg = raw_input("Try to reconnect (if not program will close)? (yes/no): ")
         if msg == 'yes':
             print "Trying to reconnect, please be patient..."
@@ -50,6 +50,7 @@ class Client(object):
             time.sleep(5)
             self.start(SERVER, PORT)
             self.loginRequest()
+            msgWorkerThread.start()
         else:
             terminate()
         pass
@@ -122,6 +123,7 @@ class Client(object):
             return
         try:
             self.send(msgJson)
+            print "Msg sent"
         except:
             print "No contact when sending msg to server"
             self.connection_closed()

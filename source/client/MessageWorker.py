@@ -17,10 +17,12 @@ executing the run() method in a new thread.
 '''
 Look here for more threading info:
 http://www.radekdostal.com/content/android-bluetooth-chat-multi-thread-echo-server-python
+http://stackoverflow.com/questions/2915160/how-do-i-abort-a-socket-recv-from-another-thread-in-python
 '''
 
 from threading import Thread
 import time
+import socket
 
 class ReceiveMessageWorker(Thread):
 
@@ -32,17 +34,18 @@ class ReceiveMessageWorker(Thread):
         
 
     def run(self):
-    	#print "HERE!\n"
-    	
-        while True:
+    	while 1:
             try:
                 data = self.connection.recv(1024).strip()
                 if len(data) != 0:
                     print "\nReceiveMessageWorker: " + data
                 self.listener.message_received(data, self.connection)
-                                #if len(data) == 0: break                
-            except IOError:
-                print "IOError"
-                #print "\nDisconnected from messageworker"
-        	#self.listener.connection_closed()
-        	
+                                #if len(data) == 0: break
+            except socket.timeout:
+                continue
+            except:
+                print "Socket Error"
+                print "\nDisconnected from messageworker"
+                self.listener.connection_closed()
+                break
+                        
