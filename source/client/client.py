@@ -31,15 +31,16 @@ class Client(object):
             #print "\nMessage: " + "\n" + message            #to be removed
             try:
                 msg = json.loads(message)
-                if 'logout' in msg:
+                response = msg['response'] 
+                if response == 'logout':
                     if 'error' in msg:
                         print "\n" + msg['username'] +" : " + msg['error']
                     else:
-                        print "\n" + msg['username'] + " logging out"
-                elif 'login' in msg:
+                        print "\n" + msg['username'] + " logged out"
+                elif response == 'login':
                     if not 'error' in msg:
                         print "\n" + msg['username'] + " logged in"
-                elif 'message' in msg:
+                elif response == 'message':
                     if 'error' in msg:
                         print "\n"+msg['error']
                         self.loginRequest()
