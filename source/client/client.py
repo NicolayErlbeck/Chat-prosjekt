@@ -24,11 +24,9 @@ class Client(object):
         except:
             print "Can not connect to server.. Please try again later"
             terminate()
-            #self.start(host, port)
 
     def message_received(self, message, connection):
         if len(message) != 0:
-            #print "\nMessage: " + "\n" + message            #to be removed
             try:
                 msg = json.loads(message)
                 response = msg['response'] 
@@ -46,7 +44,7 @@ class Client(object):
                         self.loginRequest()
                         return
                     else:
-                        print "\nMessage: " + msg['message'] #+ "\n:"                        
+                        print "\nMessage: " + msg['message']
             except:
                 print "\nInvalid message received"
                 return
@@ -55,19 +53,6 @@ class Client(object):
     def connection_closed(self):
         print "\nConnection with server is closed"
         terminate()
-        #how to restart thread?
-#        msg = raw_input("Try to reconnect (if not program will close)? (yes/no): ")
-#        if msg == 'yes':
-#            print "Trying to reconnect, please be patient..."
-#            self.force_disconnect()
-#            time.sleep(5)
-#            self.start(SERVER, PORT)
-#            self.loginRequest()
-#            msgWorkerThread.start()
-#        else:
-         
-#        pass
-    
     def send(self, data):
         self.connection.sendall(data)
 
