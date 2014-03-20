@@ -80,6 +80,7 @@ class Client(object):
                     if diff%60 >= loginTimeOut:
                         print "Timeout"
                         raise Exception()
+                print responseJson
             except:
                 print "\nNo contact with server"
                 self.connection_closed()
